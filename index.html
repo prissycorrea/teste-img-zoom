@@ -57,7 +57,7 @@
 </div>
 
 <div class="gallery">
-  <p>teste 2:16</p>
+  <p>teste 2:18</p>
     <img src="https://portalsustentabilidade.com/wp-content/uploads/2022/07/design-destaque-24-3.jpg" onclick="abrirModal(this)" style="width: 100%;">
 </div>
 
@@ -88,23 +88,34 @@
     
     // Função para adicionar funcionalidade de zoom com dois toques para dispositivos móveis
     function adicionarZoomComDoisToques() {
-        let lastTouchTime = 0;
+    let lastTouchTime = 0;
+    let touchTimeout;
 
-        modalImg.addEventListener("touchstart", function(event) {
-            const currentTime = Date.now();
-            if (currentTime - lastTouchTime < 300) { // Se o segundo toque acontecer em menos de 300ms
-                event.preventDefault(); // Previne o comportamento padrão do duplo toque no navegador, como zoom
-                if (!zoomed) {
-                    modalImg.style.transform = "scale(2)"; // Aplica o zoom
-                    zoomed = true;
-                } else {
-                    modalImg.style.transform = "scale(1)"; // Remove o zoom
-                    zoomed = false;
-                }
+    modalImg.addEventListener("touchstart", function(event) {
+        const currentTime = Date.now();
+        if (touchTimeout) {
+            clearTimeout(touchTimeout); // Limpa o timeout anterior se existir
+        }
+        if (currentTime - lastTouchTime < 300) { // Verifica se o toque é dentro de 300ms do último toque
+            event.preventDefault(); // Previne o zoom padrão e rolagem no navegador
+            if (!zoomed) {
+                modalImg.style.transform = "scale(2)"; // Aplica o zoom
+                zoomed = true;
+            } else {
+                modalImg.style.transform = "scale(1)"; // Remove o zoom
+                zoomed = false;
             }
-            lastTouchTime = currentTime; // Atualiza o tempo do último toque
-        }, false);
-    }
+            touchTimeout = null; // Reseta o timeout
+        } else {
+            touchTimeout = setTimeout(() => {
+                clearTimeout(touchTimeout); // Limpa o timeout se não houver um segundo toque rápido
+                touchTimeout = null;
+            }, 300); // Define um timeout para aguardar um possível segundo toque
+        }
+        lastTouchTime = currentTime; // Atualiza o tempo do último toque
+    }, false);
+}
+
 </script>
 </body>
 </html>
