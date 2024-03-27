@@ -57,14 +57,12 @@
 </div>
 
 <div class="gallery">
-  <p>teste 2:13</p>
-    <img src="https://portalsustentabilidade.com/wp-content/uploads/2022/07/design-destaque-24-3.jpg" onclick="abrirModal(this)" style="width: 450px;">
+  <p>teste 2:16</p>
+    <img src="https://portalsustentabilidade.com/wp-content/uploads/2022/07/design-destaque-24-3.jpg" onclick="abrirModal(this)" style="width: 100%;">
 </div>
 
 <script>
     var modalImg; // Referência para a imagem dentro do modal
-    var isDragging = false; // Variável para rastrear se o mouse está sendo arrastado
-    var startX, startY, offsetX, offsetY; // Variáveis para rastrear a posição inicial e o deslocamento
     var zoomed = false; // Variável para rastrear o estado do zoom
     
     // Função para abrir o modal e exibir a imagem clicada
@@ -78,22 +76,6 @@
       modalImg.style.transform = "scale(1)"; // Resetando o zoom ao abrir o modal
       modalImg.style.left = "0"; // Resetando a posição da imagem ao abrir o modal
       modalImg.style.top = "0";
-    
-      // Adiciona evento de duplo clique para zoom
-      modalImg.addEventListener("dblclick", function() {
-        if (zoomed) {
-          modalImg.style.transform = "scale(1)";
-          zoomed = false;
-        } else {
-          modalImg.style.transform = "scale(2)";
-          zoomed = true;
-        }
-      });
-    
-      // Adiciona eventos de arrastar
-      modalImg.addEventListener("mousedown", iniciarArraste);
-      modalImg.addEventListener("mousemove", arrastarImagem);
-      modalImg.addEventListener("mouseup", pararArraste);
       
       // Adiciona funcionalidade de zoom com dois toques para dispositivos móveis
       adicionarZoomComDoisToques();
@@ -104,36 +86,14 @@
       document.getElementById("myModal").style.display = "none";
     }
     
-    // Função para iniciar o arraste da imagem
-    function iniciarArraste(event) {
-      isDragging = true;
-      startX = event.clientX - parseFloat(window.getComputedStyle(modalImg).left);
-      startY = event.clientY - parseFloat(window.getComputedStyle(modalImg).top);
-    }
-
-    // Função para arrastar a imagem
-    function arrastarImagem(event) {
-      if (isDragging) {
-          event.preventDefault();
-          offsetX = event.clientX - startX;
-          offsetY = event.clientY - startY;
-          modalImg.style.left = offsetX + "px";
-          modalImg.style.top = offsetY + "px";
-      }
-    }
-    
-    // Função para parar o arraste da imagem
-    function pararArraste() {
-      isDragging = false;
-    }
-
-    // Função para adicionar funcionalidade de zoom com dois
+    // Função para adicionar funcionalidade de zoom com dois toques para dispositivos móveis
     function adicionarZoomComDoisToques() {
         let lastTouchTime = 0;
 
         modalImg.addEventListener("touchstart", function(event) {
             const currentTime = Date.now();
             if (currentTime - lastTouchTime < 300) { // Se o segundo toque acontecer em menos de 300ms
+                event.preventDefault(); // Previne o comportamento padrão do duplo toque no navegador, como zoom
                 if (!zoomed) {
                     modalImg.style.transform = "scale(2)"; // Aplica o zoom
                     zoomed = true;
@@ -141,37 +101,9 @@
                     modalImg.style.transform = "scale(1)"; // Remove o zoom
                     zoomed = false;
                 }
-                event.preventDefault(); // Previne o comportamento padrão do duplo toque no navegador, como zoom
             }
             lastTouchTime = currentTime; // Atualiza o tempo do último toque
         }, false);
-    }
-
-
-        // Adiciona funcionalidade de zoom com gestos de pinça
-        let startDistance = 0;
-        let zoomLevel = 1;
-
-        modalImg.addEventListener('touchstart', function(e) {
-            if (e.touches.length === 2) {
-                startDistance = Math.hypot(
-                    e.touches[0].pageX - e.touches[1].pageX,
-                    e.touches[0].pageY - e.touches[1].pageY
-                );
-            }
-        });
-
-        modalImg.addEventListener('touchmove', function(e) {
-            if (e.touches.length === 2) {
-                e.preventDefault(); // Previne o zoom padrão do navegador e rolagem
-                const moveDistance = Math.hypot(
-                    e.touches[0].pageX - e.touches[1].pageX,
-                    e.touches[0].pageY - e.touches[1].pageY
-                );
-                zoomLevel = moveDistance / startDistance;
-                modalImg.style.transform = `scale(${zoomLevel})`;
-            }
-        });
     }
 </script>
 </body>
