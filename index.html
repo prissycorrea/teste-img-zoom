@@ -5,47 +5,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zoom e Arraste na Imagem</title>
 <style>
-/* Estilo do modal */
 .modal {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  padding-top: 50px;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.9);
-  text-align: center;
+ display: none;
+ position: fixed;
+ z-index: 1;
+ padding-top: 50px;
+ left: 0;
+ top: 0;
+ width: 100%;
+ height: 100%;
+ overflow: auto;
+ background-color: rgba(153, 94, 94, 0.9);
+ text-align: center;
 }
 
-/* Conteúdo do modal */
 .modal-content {
- max-width: 100%;
+ width: 100%;
  max-height: 100%;
- cursor: move; /* Altera o cursor para indicar que a imagem é movível */
+ cursor: move;
  transition: transform 0.2s;
- position: relative; /* Adicionado para permitir o posicionamento relativo */
- touch-action: manipulation;
+ position: relative;
+ touch-action: none; /* Desabilita a ação padrão de toque para permitir o arraste */
+ object-fit: contain;
 }
 
-/* Estilo do botão de fechar */
 .close {
-  position: absolute;
-  top: 10px;
-  right: 25px;
-  color: #fff;
-  font-size: 35px;
-  font-weight: bold;
-  transition: 0.3s;
+ position: absolute;
+ top: 10px;
+ right: 25px;
+ color: #fff;
+ font-size: 35px;
+ font-weight: bold;
+ transition: 0.3s;
 }
 
 .close:hover,
 .close:focus {
-  color: #bbb;
-  text-decoration: none;
-  cursor: pointer;
+ color: #bbb;
+ text-decoration: none;
+ cursor: pointer;
 }
 
 .disable-dbl-tap-zoom {
@@ -56,70 +54,92 @@
 <body>
 
 <div class="modal" id="myModal">
-  <span class="close" onclick="fecharModal()">&times;</span>
-  <img class="modal-content disable-dbl-tap-zoom" id="imgZoom">
+ <span class="close" onclick="fecharModal()">&times;</span>
+ <img class="modal-content disable-dbl-tap-zoom" id="imgZoom">
 </div>
 
 <div class="gallery">
-  <p>teste 2:22</p>
-    <img src="https://portalsustentabilidade.com/wp-content/uploads/2022/07/design-destaque-24-3.jpg" onclick="abrirModal(this)" style="width: 100%;">
+ <p>teste 3:47</p>
+ <img src="https://portalsustentabilidade.com/wp-content/uploads/2022/07/design-destaque-24-3.jpg" onclick="abrirModal(this)" style="width: 100%;">
+ <img src="https://www.petlove.com.br/images/breeds/227696/profile/original/perfil-coelho.jpg?1597789099" onclick="abrirModal(this)" style="width: 100%;">
+ <img src="https://img.freepik.com/fotos-gratis/foto-vertical-de-uma-estrada-com-montanhas-magnificas-sob-o-ceu-azul-capturada-na-california_181624-44891.jpg?size=626&ext=jpg&ga=GA1.1.735520172.1711497600&semt=sph" onclick="abrirModal(this)" style="width: 100%;">
 </div>
 
 <script>
-    var modalImg; // Referência para a imagem dentro do modal
+    var modal = document.getElementById("myModal");
+    var modalImg = document.getElementById("imgZoom"); // Referência para a imagem dentro do modal
     var zoomed = false; // Variável para rastrear o estado do zoom
-    
-    // Função para abrir o modal e exibir a imagem clicada
+
+    // Variáveis para rastrear o estado do arraste
+    var isDragging = false;
+    var dragStartX = 0;
+    var dragStartY = 0;
+
     function abrirModal(img) {
-      var modal = document.getElementById("myModal");
-      modal.style.display = "block";
-      
-      // Referência para a imagem dentro do modal
-      modalImg = document.getElementById("imgZoom");
-      modalImg.src = img.src;
-      modalImg.style.transform = "scale(1)"; // Resetando o zoom ao abrir o modal
-      modalImg.style.left = "0"; // Resetando a posição da imagem ao abrir o modal
-      modalImg.style.top = "0";
-      
-      // Adiciona funcionalidade de zoom com dois toques para dispositivos móveis
-      adicionarZoomComDoisToques();
+        modal.style.display = "block";
+        modalImg.src = img.src;
+        modalImg.style.transform = "scale(1)"; // Resetando o zoom ao abrir o modal
+        // Resetando a posição da imagem ao abrir o modal
+        modalImg.style.left = "0px";
+        modalImg.style.top = "0px";
+        adicionarZoomComDoisToques();
     }
-    
-    // Função para fechar o modal
+
     function fecharModal() {
-      document.getElementById("myModal").style.display = "none";
+        modal.style.display = "none";
     }
-    
-    // Função para adicionar funcionalidade de zoom com dois toques para dispositivos móveis
+
     function adicionarZoomComDoisToques() {
-    let lastTouchTime = 0;
-    let touchTimeout;
-
-    modalImg.addEventListener("touchstart", function(event) {
-        const currentTime = Date.now();
-        if (touchTimeout) {
-            clearTimeout(touchTimeout); // Limpa o timeout anterior se existir
-        }
-        if (currentTime - lastTouchTime < 300) { // Verifica se o toque é dentro de 300ms do último toque
-            event.preventDefault(); // Previne o zoom padrão e rolagem no navegador
-            if (!zoomed) {
-                modalImg.style.transform = "scale(2)"; // Aplica o zoom
-                zoomed = true;
+        let lastTouchTime = 0;
+        modalImg.addEventListener("touchstart", function(event) {
+            const currentTime = Date.now();
+            if (currentTime - lastTouchTime < 300) {
+                event.preventDefault();
+                toggleZoom();
+                lastTouchTime = 0;
             } else {
-                modalImg.style.transform = "scale(1)"; // Remove o zoom
-                zoomed = false;
+                lastTouchTime = currentTime;
             }
-            touchTimeout = null; // Reseta o timeout
-        } else {
-            touchTimeout = setTimeout(() => {
-                clearTimeout(touchTimeout); // Limpa o timeout se não houver um segundo toque rápido
-                touchTimeout = null;
-            }, 300); // Define um timeout para aguardar um possível segundo toque
-        }
-        lastTouchTime = currentTime; // Atualiza o tempo do último toque
-    }, false);
-}
+        }, false);
+    }
 
+    function toggleZoom() {
+        if (!zoomed) {
+            modalImg.style.transform = "scale(2)";
+            zoomed = true;
+        } else {
+            modalImg.style.transform = "scale(1)";
+            zoomed = false;
+        }
+    }
+
+    // Eventos de arraste para desktop
+    modalImg.addEventListener('mousedown', iniciarArraste);
+    window.addEventListener('mousemove', arrastar);
+    window.addEventListener('mouseup', finalizarArraste);
+
+    function iniciarArraste(e) {
+        e.preventDefault();
+        isDragging = true;
+        dragStartX = e.clientX - modalImg.offsetLeft;
+        dragStartY = e.clientY - modalImg.offsetTop;
+        modalImg.style.cursor = 'grabbing';
+    }
+
+    function arrastar(e) {
+        if (isDragging) {
+            var newX = e.clientX - dragStartX;
+            var newY = e.clientY - dragStartY;
+            modalImg.style.left = newX + 'px';
+            modalImg.style.top = newY + 'px';
+        }
+    }
+
+    function finalizarArraste() {
+        isDragging = false;
+        modalImg.style.cursor = 'grab';
+    }
 </script>
+
 </body>
 </html>
