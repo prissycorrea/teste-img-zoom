@@ -62,89 +62,78 @@
 
 <script>
     var modalImg; // Referência para a imagem dentro do modal
-    var isDragging = false; // Variável para rastrear se o mouse está sendo arrastado
-    var startX, startY, offsetX, offsetY; // Variáveis para rastrear a posição inicial e o deslocamento
-    
-    // Função para abrir o modal e exibir a imagem clicada
-    function abrirModal(img) {
-      var modal = document.getElementById("myModal");
-      modal.style.display = "block";
-      
-      // Referência para a imagem dentro do modal
-      modalImg = document.getElementById("imgZoom");
-      modalImg.src = img.src;
-      modalImg.style.transform = "scale(1)"; // Resetando o zoom ao abrir o modal
-      modalImg.style.left = "0"; // Resetando a posição da imagem ao abrir o modal
-      modalImg.style.top = "0";
-    
-      // Adiciona evento de duplo clique para zoom
-      var zoomed = false;
-      modalImg.addEventListener("dblclick", function() {
-        if (zoomed) {
-          modalImg.style.transform = "scale(1)";
-          zoomed = false;
-        } else {
-          modalImg.style.transform = "scale(2)";
-          zoomed = true;
-        }
-      });
-    
-      // Adiciona eventos de arrastar
-      modalImg.addEventListener("mousedown", iniciarArraste);
-      modalImg.addEventListener("mousemove", arrastarImagem);
-      modalImg.addEventListener("mouseup", pararArraste);
-    }
-    
-    // Função para fechar o modal
-    function fecharModal() {
-      document.getElementById("myModal").style.display = "none";
-    }
-    
-    // Função para iniciar o arraste da imagem
+var isDragging = false; // Variável para rastrear se o mouse está sendo arrastado
+var startX, startY, offsetX, offsetY; // Variáveis para rastrear a posição inicial e o deslocamento
+var zoomed = false; // Variável para rastrear o estado de zoom
+
+// Função para abrir o modal e exibir a imagem clicada
+function abrirModal(img) {
+  var modal = document.getElementById("myModal");
+  modal.style.display = "block";
+  
+  // Referência para a imagem dentro do modal
+  modalImg = document.getElementById("imgZoom");
+  modalImg.src = img.src;
+  modalImg.style.transform = "scale(1)"; // Resetando o zoom ao abrir o modal
+  modalImg.style.left = "0"; // Resetando a posição da imagem ao abrir o modal
+  modalImg.style.top = "0";
+
+  // Adiciona eventos de arrastar
+  modalImg.addEventListener("mousedown", iniciarArraste);
+  modalImg.addEventListener("mousemove", arrastarImagem);
+  modalImg.addEventListener("mouseup", pararArraste);
+}
+
+// Função para fechar o modal
+function fecharModal() {
+  document.getElementById("myModal").style.display = "none";
+}
+
+// Função para iniciar o arraste da imagem
 function iniciarArraste(event) {
- isDragging = true;
- startX = event.clientX - parseFloat(window.getComputedStyle(modalImg).left);
- startY = event.clientY - parseFloat(window.getComputedStyle(modalImg).top);
+  isDragging = true;
+  startX = event.clientX - parseFloat(window.getComputedStyle(modalImg).left);
+  startY = event.clientY - parseFloat(window.getComputedStyle(modalImg).top);
 }
 
 // Função para arrastar a imagem
 function arrastarImagem(event) {
- if (isDragging) {
+  if (isDragging) {
     event.preventDefault();
     offsetX = event.clientX - startX;
     offsetY = event.clientY - startY;
     modalImg.style.left = offsetX + "px";
     modalImg.style.top = offsetY + "px";
- }
+  }
 }
-    
-    // Função para parar o arraste da imagem
-    function pararArraste() {
-      isDragging = false;
-    }
 
-    //Dispositivos móveis
-    let startDistance = 0;
+// Função para parar o arraste da imagem
+function pararArraste() {
+  isDragging = false;
+}
+
+//Dispositivos móveis
+let startDistance = 0;
 let zoomLevel = 1;
 
 modalImg.addEventListener('touchstart', function(e) {
- if (e.touches.length === 2) {
+  if (e.touches.length === 2) {
     startDistance = Math.hypot(
       e.touches[0].pageX - e.touches[1].pageX,
       e.touches[0].pageY - e.touches[1].pageY
     );
- }
+  }
 });
 
 modalImg.addEventListener('touchmove', function(e) {
- if (e.touches.length === 2) {
+  if (e.touches.length === 2) {
     const moveDistance = Math.hypot(
       e.touches[0].pageX - e.touches[1].pageX,
       e.touches[0].pageY - e.touches[1].pageY
     );
     zoomLevel = moveDistance / startDistance;
     modalImg.style.transform = `scale(${zoomLevel})`;
- }
+  }
 });
 
 // Adiciona evento de duplo clique para zoom em dispositivos móveis
