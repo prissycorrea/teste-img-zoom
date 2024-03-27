@@ -147,6 +147,21 @@ modalImg.addEventListener('touchmove', function(e) {
  }
 });
 
+// Adiciona evento de duplo clique para zoom em dispositivos móveis
+modalImg.addEventListener("touchstart", function(event) {
+  if (!zoomed) {
+    setTimeout(function(){
+      if (!zoomed) {
+        modalImg.style.transform = "scale(2)";
+        zoomed = true;
+      } else {
+        modalImg.style.transform = "scale(1)";
+        zoomed = false;
+      }
+    }, 300);
+  }
+});
+
     </script>
 </body>
 </html>
