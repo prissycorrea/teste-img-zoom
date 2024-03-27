@@ -47,17 +47,21 @@
   text-decoration: none;
   cursor: pointer;
 }
+
+.disable-dbl-tap-zoom {
+ touch-action: manipulation;
+}
 </style>
 </head>
 <body>
 
 <div class="modal" id="myModal">
   <span class="close" onclick="fecharModal()">&times;</span>
-  <img class="modal-content" id="imgZoom">
+  <img class="modal-content disable-dbl-tap-zoom" id="imgZoom">
 </div>
 
 <div class="gallery">
-  <p>teste 2:18</p>
+  <p>teste 2:22</p>
     <img src="https://portalsustentabilidade.com/wp-content/uploads/2022/07/design-destaque-24-3.jpg" onclick="abrirModal(this)" style="width: 100%;">
 </div>
 
