@@ -57,7 +57,7 @@
 </div>
 
 <div class="gallery">
-  <p>teste 2:05</p>
+  <p>teste 2:10</p>
     <img src="https://portalsustentabilidade.com/wp-content/uploads/2022/07/design-destaque-24-3.jpg" onclick="abrirModal(this)" style="width: 450px;">
 </div>
 
@@ -65,6 +65,7 @@
     var modalImg; // Referência para a imagem dentro do modal
     var isDragging = false; // Variável para rastrear se o mouse está sendo arrastado
     var startX, startY, offsetX, offsetY; // Variáveis para rastrear a posição inicial e o deslocamento
+    var zoomed = false; // Variável para rastrear o estado do zoom
     
     // Função para abrir o modal e exibir a imagem clicada
     function abrirModal(img) {
@@ -79,7 +80,6 @@
       modalImg.style.top = "0";
     
       // Adiciona evento de duplo clique para zoom
-      var zoomed = false;
       modalImg.addEventListener("dblclick", function() {
         if (zoomed) {
           modalImg.style.transform = "scale(1)";
@@ -94,6 +94,9 @@
       modalImg.addEventListener("mousedown", iniciarArraste);
       modalImg.addEventListener("mousemove", arrastarImagem);
       modalImg.addEventListener("mouseup", pararArraste);
+      
+      // Adiciona funcionalidade de zoom com dois toques para dispositivos móveis
+      adicionarZoomComDoisToques();
     }
     
     // Função para fechar o modal
@@ -102,67 +105,82 @@
     }
     
     // Função para iniciar o arraste da imagem
-function iniciarArraste(event) {
- isDragging = true;
- startX = event.clientX - parseFloat(window.getComputedStyle(modalImg).left);
- startY = event.clientY - parseFloat(window.getComputedStyle(modalImg).top);
-}
+    function iniciarArraste(event) {
+      isDragging = true;
+      startX = event.clientX - parseFloat(window.getComputedStyle(modalImg).left);
+      startY = event.clientY - parseFloat(window.getComputedStyle(modalImg).top);
+    }
 
-// Função para arrastar a imagem
-function arrastarImagem(event) {
- if (isDragging) {
-    event.preventDefault();
-    offsetX = event.clientX - startX;
-    offsetY = event.clientY - startY;
-    modalImg.style.left = offsetX + "px";
-    modalImg.style.top = offsetY + "px";
- }
-}
+    // Função para arrastar a imagem
+    function arrastarImagem(event) {
+      if (isDragging) {
+          event.preventDefault();
+          offsetX = event.clientX - startX;
+          offsetY = event.clientY - startY;
+          modalImg.style.left = offsetX + "px";
+          modalImg.style.top = offsetY + "px";
+      }
+    }
     
     // Função para parar o arraste da imagem
     function pararArraste() {
       isDragging = false;
     }
 
-    //Dispositivos móveis
-    let startDistance = 0;
-let zoomLevel = 1;
+    // Função para adicionar funcionalidade de zoom com dois
+    function adicionarZoomComDoisToques() {
+        let lastTouchTime = 0;
+        let touchTimeout = null;
 
-modalImg.addEventListener('touchstart', function(e) {
- if (e.touches.length === 2) {
-    startDistance = Math.hypot(
-      e.touches[0].pageX - e.touches[1].pageX,
-      e.touches[0].pageY - e.touches[1].pageY
-    );
- }
-});
+        modalImg.addEventListener("touchstart", function(event) {
+            const currentTime = Date.now();
+            const tapLength = currentTime - lastTouchTime;
+            clearTimeout(touchTimeout);
 
-modalImg.addEventListener('touchmove', function(e) {
- if (e.touches.length === 2) {
-    const moveDistance = Math.hypot(
-      e.touches[0].pageX - e.touches[1].pageX,
-      e.touches[0].pageY - e.touches[1].pageY
-    );
-    zoomLevel = moveDistance / startDistance;
-    modalImg.style.transform = `scale(${zoomLevel})`;
- }
-});
+            if (tapLength > 0 && tapLength < 300) {
+                // Duplo toque detectado
+                if (!zoomed) {
+                    modalImg.style.transform = "scale(2)";
+                    zoomed = true;
+                } else {
+                    modalImg.style.transform = "scale(1)";
+                    zoomed = false;
+                }
+            } else {
+                // Primeiro toque, inicia um temporizador para verificar se um segundo toque ocorrerá
+                touchTimeout = setTimeout(() => {
+                    clearTimeout(touchTimeout);
+                }, 300);
+            }
 
-// Adiciona evento de duplo clique para zoom em dispositivos móveis
-modalImg.addEventListener("touchstart", function(event) {
-  if (!zoomed) {
-    setTimeout(function(){
-      if (!zoomed) {
-        modalImg.style.transform = "scale(2)";
-        zoomed = true;
-      } else {
-        modalImg.style.transform = "scale(1)";
-        zoomed = false;
-      }
-    }, 300);
-  }
-});
+            lastTouchTime = currentTime;
+        }, false);
 
-    </script>
+        // Adiciona funcionalidade de zoom com gestos de pinça
+        let startDistance = 0;
+        let zoomLevel = 1;
+
+        modalImg.addEventListener('touchstart', function(e) {
+            if (e.touches.length === 2) {
+                startDistance = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+            }
+        });
+
+        modalImg.addEventListener('touchmove', function(e) {
+            if (e.touches.length === 2) {
+                e.preventDefault(); // Previne o zoom padrão do navegador e rolagem
+                const moveDistance = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                zoomLevel = moveDistance / startDistance;
+                modalImg.style.transform = `scale(${zoomLevel})`;
+            }
+        });
+    }
+</script>
 </body>
 </html>
