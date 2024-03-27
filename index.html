@@ -57,7 +57,7 @@
 </div>
 
 <div class="gallery">
-  <p>teste 2:10</p>
+  <p>teste 2:13</p>
     <img src="https://portalsustentabilidade.com/wp-content/uploads/2022/07/design-destaque-24-3.jpg" onclick="abrirModal(this)" style="width: 450px;">
 </div>
 
@@ -130,31 +130,23 @@
     // Função para adicionar funcionalidade de zoom com dois
     function adicionarZoomComDoisToques() {
         let lastTouchTime = 0;
-        let touchTimeout = null;
 
         modalImg.addEventListener("touchstart", function(event) {
             const currentTime = Date.now();
-            const tapLength = currentTime - lastTouchTime;
-            clearTimeout(touchTimeout);
-
-            if (tapLength > 0 && tapLength < 300) {
-                // Duplo toque detectado
+            if (currentTime - lastTouchTime < 300) { // Se o segundo toque acontecer em menos de 300ms
                 if (!zoomed) {
-                    modalImg.style.transform = "scale(2)";
+                    modalImg.style.transform = "scale(2)"; // Aplica o zoom
                     zoomed = true;
                 } else {
-                    modalImg.style.transform = "scale(1)";
+                    modalImg.style.transform = "scale(1)"; // Remove o zoom
                     zoomed = false;
                 }
-            } else {
-                // Primeiro toque, inicia um temporizador para verificar se um segundo toque ocorrerá
-                touchTimeout = setTimeout(() => {
-                    clearTimeout(touchTimeout);
-                }, 300);
+                event.preventDefault(); // Previne o comportamento padrão do duplo toque no navegador, como zoom
             }
-
-            lastTouchTime = currentTime;
+            lastTouchTime = currentTime; // Atualiza o tempo do último toque
         }, false);
+    }
+
 
         // Adiciona funcionalidade de zoom com gestos de pinça
         let startDistance = 0;
