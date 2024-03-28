@@ -60,7 +60,7 @@
 </div>
 
 <div class="gallery">
- <p>teste X fixo</p>
+ <p>teste zoom com tempo menor</p>
  <img src="https://portalsustentabilidade.com/wp-content/uploads/2022/07/design-destaque-24-3.jpg" onclick="abrirModal(this)" style="width: 100%;">
  <img src="https://www.petlove.com.br/images/breeds/227696/profile/original/perfil-coelho.jpg?1597789099" onclick="abrirModal(this)" style="width: 100%;">
  <img src="https://img.freepik.com/fotos-gratis/foto-vertical-de-uma-estrada-com-montanhas-magnificas-sob-o-ceu-azul-capturada-na-california_181624-44891.jpg?size=626&ext=jpg&ga=GA1.1.735520172.1711497600&semt=sph" onclick="abrirModal(this)" style="width: 100%;">
@@ -99,7 +99,7 @@
 
     modalImg.addEventListener("touchstart", function(event) {
         const currentTime = Date.now();
-        if (currentTime - lastTouchTime < 300) {
+        if (currentTime - lastTouchTime <= 400) {
             event.preventDefault();
             toggleZoom();
             lastTouchTime = 0;
