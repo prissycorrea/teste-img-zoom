@@ -30,7 +30,7 @@
 }
 
 .close {
- position: absolute;
+ position: fixed;
  top: 10px;
  right: 25px;
  color: #fff;
@@ -38,6 +38,7 @@
  font-weight: bold;
  transition: 0.3s;
 }
+
 
 .close:hover,
 .close:focus {
@@ -59,7 +60,7 @@
 </div>
 
 <div class="gallery">
- <p>teste 3:47</p>
+ <p>teste X fixo</p>
  <img src="https://portalsustentabilidade.com/wp-content/uploads/2022/07/design-destaque-24-3.jpg" onclick="abrirModal(this)" style="width: 100%;">
  <img src="https://www.petlove.com.br/images/breeds/227696/profile/original/perfil-coelho.jpg?1597789099" onclick="abrirModal(this)" style="width: 100%;">
  <img src="https://img.freepik.com/fotos-gratis/foto-vertical-de-uma-estrada-com-montanhas-magnificas-sob-o-ceu-azul-capturada-na-california_181624-44891.jpg?size=626&ext=jpg&ga=GA1.1.735520172.1711497600&semt=sph" onclick="abrirModal(this)" style="width: 100%;">
@@ -90,18 +91,36 @@
     }
 
     function adicionarZoomComDoisToques() {
-        let lastTouchTime = 0;
-        modalImg.addEventListener("touchstart", function(event) {
-            const currentTime = Date.now();
-            if (currentTime - lastTouchTime < 300) {
-                event.preventDefault();
-                toggleZoom();
-                lastTouchTime = 0;
-            } else {
-                lastTouchTime = currentTime;
-            }
-        }, false);
-    }
+    let lastTouchTime = 0;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let translateX = 0;
+    let translateY = 0;
+
+    modalImg.addEventListener("touchstart", function(event) {
+        const currentTime = Date.now();
+        if (currentTime - lastTouchTime < 300) {
+            event.preventDefault();
+            toggleZoom();
+            lastTouchTime = 0;
+        } else {
+            lastTouchTime = currentTime;
+            touchStartX = event.touches[0].clientX;
+            touchStartY = event.touches[0].clientY;
+        }
+    }, false);
+
+    modalImg.addEventListener("touchmove", function(event) {
+        if (zoomed) {
+            event.preventDefault();
+            const touchMoveX = event.touches[0].clientX;
+            const touchMoveY = event.touches[0].clientY;
+            translateX = touchMoveX - touchStartX;
+            translateY = touchMoveY - touchStartY;
+            modalImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(2)`;
+        }
+    }, false);
+}
 
     function toggleZoom() {
         if (!zoomed) {
